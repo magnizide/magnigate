@@ -5,7 +5,7 @@ ifneq (,$(wildcard ./$(ENV_ARG)))
 endif
 
 PROJECT_ROOT := $(realpath .)
-CONFIG_PATHS = config config/traefik
+CONFIG_PATHS = config config/traefik config/pangolin
 SHELL := bash
 
 check_config_dir:
@@ -20,13 +20,13 @@ check_config_dir:
 	done
 
 create_dir_config:
-	@mkdir -p $(PROJECT_ROOT)/config/traefik
+	@mkdir -p $(PROJECT_ROOT)/config/{traefik,pangolin}
 
 fill_templates:
-	envsubst < $(PROJECT_ROOT)/templates/config/traefik/dynamic_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/dynamic_config.yml
+	envsubst < $(PROJECT_ROOT)/templates/config/traefik/dynamic_config.yaml.tpl > $(PROJECT_ROOT)/config/traefik/dynamic_config.yaml
 
-	envsubst < $(PROJECT_ROOT)/templates/config/traefik/traefik_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/traefik_config.yml
+	envsubst < $(PROJECT_ROOT)/templates/config/traefik/traefik_config.yaml.tpl > $(PROJECT_ROOT)/config/traefik/traefik_config.yaml
 
-test:
-	$(MAKE) check_config_dir
-	@echo "$(ENVIRONMENT)"
+	envsubst < $(PROJECT_ROOT)/templates/config/pangolin/config.yaml.tpl > $(PROJECT_ROOT)/config/pangolin/config.yaml
+
+all: check_config_dir fill_templates

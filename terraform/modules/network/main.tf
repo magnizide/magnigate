@@ -12,13 +12,6 @@ resource "google_compute_subnetwork" "subnet" {
   network       = google_compute_network.vpc_network.id
   ip_cidr_range = var.ip_range
   # gateway_address = "${var.gw_addr}" Cannot be defined automatically uses first avail IP.
-
-  secondary_ip_range = [
-    {
-      range_name    = format("subnet-%d", 0)
-      ip_cidr_range = var.sub_ip_ranges[0]
-    },
-  ]
 }
 
 resource "google_compute_firewall" "firewall_rules" {

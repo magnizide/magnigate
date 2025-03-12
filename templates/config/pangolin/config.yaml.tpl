@@ -27,7 +27,7 @@ gerbil:
     start_port: 51820
     base_endpoint: "${GERBIL_BASE_ENDPOINT}" #EXAMPLE: "example.com"
     use_subdomain: false
-    block_size: 24
+    block_size: 29
     site_block_size: 30
     subnet_group: ${GERBIL_SUBNET_GROUP} #EXAMPLE: 100.89.137.0/20
 

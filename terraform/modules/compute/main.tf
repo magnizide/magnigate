@@ -9,31 +9,33 @@
 #}
 
 data "google_compute_image" "base_image" {
-    family  = var.image_family
-    project = var.project_id
+  family      = var.image_family
+  most_recent = true
+  project     = var.image_project
 }
 
 resource "google_compute_instance" "instance" {
-    name            = format("%s-%s-%s-instance",var.service_name,var.region,terraform.workspace)
-    machine_type    = "e2-micro"
-    zone            = var.zone
-    project         = var.project_id
-    can_ip_forward  = true
-    boot_disk {
-        initialize_params {
-            image = data.google_compute_image.base_image.self_link
-            type = "pd-standard"
-        }
+  name           = format("%s-%s-%s-instance", var.service_name, var.region, terraform.workspace)
+  machine_type   = "e2-micro"
+  zone           = var.zone
+  project        = var.project_id
+  can_ip_forward = true
+  tags           = var.compute_tags
+  boot_disk {
+    initialize_params {
+      image = data.google_compute_image.base_image.self_link
+      type  = "pd-standard"
     }
-    network_interface {
-        subnetwork          = var.subnet_id
-        subnetwork_project  = var.project_id
-        access_config {
-            nat_ip                  = var.external_static_address
-            network_tier            = "STANDARD"
-        }
+  }
+  network_interface {
+    subnetwork         = var.subnet_id
+    subnetwork_project = var.project_id
+    access_config {
+      nat_ip       = var.external_static_address
+      network_tier = "STANDARD"
     }
-    metadata = {
-        startup-script      = data.template_file.startup-script-custom.rendered
-    }
+  }
+  #metadata = {
+  #    startup-script      = data.template_file.startup-script-custom.rendered
+  #}
 }

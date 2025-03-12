@@ -17,3 +17,8 @@ fw_rules_ports = [
   [443, 80, 51820],
   ["51820"]
 ]
+# Compute tags
+compute_tags = [
+  "magnigate",
+  "ssh_port_enabled"
+]
