@@ -27,16 +27,6 @@ variable "ip_range" {
   description = "CIDR range."
 }
 
-#variable "gw_addr" {
-#  type        = string
-#  description = "Gateway for the defined big range (make sure it is the last usable address)."
-#}
-
-#variable "sub_ip_ranges" {
-#  type        = list(string)
-#  description = "List of ip ranges contanined in (ip_range)."
-#}
-
 variable "fw_rules_desc" {
   type        = list(string)
   description = "Contains specific rules for the vpc network."
@@ -55,4 +45,9 @@ variable "fw_rules_proto" {
 variable "fw_rules_ports" {
   type        = list(any)
   description = "Contains specific rules for the vpc network."
+}
+
+variable "fw_rules_target_tags" {
+  type        = list(any)
+  description = "Targets to apply the rules on."
 }

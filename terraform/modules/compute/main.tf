@@ -20,7 +20,7 @@ resource "google_compute_instance" "instance" {
   zone           = var.zone
   project        = var.project_id
   can_ip_forward = true
-  tags           = var.compute_tags
+  tags           = [for tag in var.fw_rules_target_tags: tag[0]]
   boot_disk {
     initialize_params {
       image = data.google_compute_image.base_image.self_link

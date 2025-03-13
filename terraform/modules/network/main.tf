@@ -21,6 +21,7 @@ resource "google_compute_firewall" "firewall_rules" {
   network       = google_compute_network.vpc_network.name
   description   = var.fw_rules_desc[count.index]
   source_ranges = var.fw_rules_src_r[count.index]
+  target_tags   = var.fw_rules_target_tags[count.index]
   allow {
     protocol = var.fw_rules_proto[count.index]
     ports    = var.fw_rules_ports[count.index]

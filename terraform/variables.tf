@@ -20,11 +20,6 @@ variable "service_name" {
   description = "MagniOps Specific Project Name."
 }
 
-variable "compute_tags" {
-  type        = list(string)
-  description = "Compute tags for project."
-}
-
 # Network Module Vars
 
 variable "ip_range" {
@@ -40,6 +35,11 @@ variable "fw_rules_desc" {
 variable "fw_rules_src_r" {
   type        = list(any)
   description = "Contains specific rules for the vpc network."
+}
+
+variable "fw_rules_target_tags" {
+  type        = list(any)
+  description = "Targets to apply the rules on."
 }
 
 variable "fw_rules_proto" {

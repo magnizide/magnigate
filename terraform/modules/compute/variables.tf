@@ -32,9 +32,9 @@ variable "zone" {
   default     = "us-east1-b"
 }
 
-variable "compute_tags" {
-  type        = list(string)
-  description = "List of tags to attach to the instance."
+variable "fw_rules_target_tags" {
+  type        = list(any)
+  description = "Targets to apply the rules on."
 }
 
 # Imported Module Vars
