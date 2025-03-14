@@ -7,6 +7,7 @@ output "subnet_id" {
 }
 
 output "external_static_address" {
-  value = google_compute_address.external_static.address
+  value     = google_compute_address.external_static.address
+  sensitive = true
 }
 

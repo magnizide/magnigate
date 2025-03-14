@@ -1,17 +1,15 @@
-# data "template_file" "startup-script-custom" {
-#    template = file("${path.root}/templates/startup-script.tpl")
-#    vars = {
-#        access_token		= var.access_token
-#        certs_object_url   = var.certs_object_url
-#        sw_object_url		= var.sw_object_url
-#    }
-#
-#}
+data "google_client_openid_userinfo" "me" {
+}
 
 data "google_compute_image" "base_image" {
   family      = var.image_family
   most_recent = true
   project     = var.image_project
+}
+
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "google_compute_instance" "instance" {
@@ -20,7 +18,11 @@ resource "google_compute_instance" "instance" {
   zone           = var.zone
   project        = var.project_id
   can_ip_forward = true
-  tags           = [for tag in var.fw_rules_target_tags: tag[0]]
+  tags           = [for tag in var.fw_rules_target_tags : tag[0]]
+  labels = {
+    "service_name" = var.service_name
+    "env"          = terraform.workspace
+  }
   boot_disk {
     initialize_params {
       image = data.google_compute_image.base_image.self_link
@@ -35,7 +37,7 @@ resource "google_compute_instance" "instance" {
       network_tier = "STANDARD"
     }
   }
-  #metadata = {
-  #    startup-script      = data.template_file.startup-script-custom.rendered
-  #}
+  metadata = {
+    "ssh-keys" = "${split("@", data.google_client_openid_userinfo.me.email)[0]}:${tls_private_key.ssh_key.public_key_openssh}"
+  }
 }
