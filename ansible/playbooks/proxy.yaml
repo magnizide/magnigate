@@ -40,7 +40,17 @@
           - "-S"
           - "all"
         chdir: /opt/www
-
-
-    
-      
+    - name: Gcloud pull certs
+      ansible.builtin.command:
+        argv:
+          - gcloud
+          - storage
+          - cp
+          - "gs://magnigate-acme-certs/dev/dev-acme.json"
+          - /opt/www/config/letsencrypt/acme.json
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: /opt/www/config/letsencrypt/acme.json
+        owner: root
+        group: root
+        mode: '0600'
