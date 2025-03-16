@@ -54,3 +54,10 @@
         owner: root
         group: root
         mode: '0600'
+    - name: Create and start services
+      community.docker.docker_compose_v2:
+        project_src: /opt/www
+      register: output
+    - name: Show Compose results
+      ansible.builtin.debug:
+        var: output
