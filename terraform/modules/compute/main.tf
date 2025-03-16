@@ -13,12 +13,13 @@ resource "tls_private_key" "ssh_key" {
 }
 
 resource "google_compute_instance" "instance" {
-  name           = format("%s-%s-%s-instance", var.service_name, var.region, terraform.workspace)
-  machine_type   = "e2-micro"
-  zone           = var.zone
-  project        = var.project_id
-  can_ip_forward = true
-  tags           = [for tag in var.fw_rules_target_tags : tag[0]]
+  allow_stopping_for_update = true
+  name                      = format("%s-%s-%s-instance", var.service_name, var.region, terraform.workspace)
+  machine_type              = "e2-micro"
+  zone                      = var.zone
+  project                   = var.project_id
+  can_ip_forward            = true
+  tags                      = [for tag in var.fw_rules_target_tags : tag[0]]
   labels = {
     "service_name" = var.service_name
     "env"          = terraform.workspace
@@ -39,5 +40,9 @@ resource "google_compute_instance" "instance" {
   }
   metadata = {
     "ssh-keys" = "${split("@", data.google_client_openid_userinfo.me.email)[0]}:${tls_private_key.ssh_key.public_key_openssh}"
+  }
+  service_account {
+    email  = var.service_account_email
+    scopes = ["cloud-platform"]
   }
 }

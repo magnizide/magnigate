@@ -48,3 +48,9 @@ variable "external_static_address" {
   type        = string
   description = "External IP address ID from the network module."
 }
+
+variable "service_account_email" {
+  type        = string
+  description = "Service account Email."
+  sensitive   = true
+}

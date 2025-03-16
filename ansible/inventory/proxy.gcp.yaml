@@ -2,7 +2,7 @@
 plugin: google.cloud.gcp_compute
 zones:
   - us-east1-b
-projects:
+projects: 
   - magniops-dev
 filters:
   - status = RUNNING
@@ -13,3 +13,4 @@ hostnames:
   - public_ip
 compose:
   ansible_host: networkInterfaces[0].accessConfigs[0].natIP
+

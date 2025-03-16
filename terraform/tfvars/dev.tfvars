@@ -1,3 +1,9 @@
+# Cloudflare
+cloudflare_zone_id = "3a3778b31e37846025d72b8479c3a50e"
+record_name = [
+  "dev-proxy",
+  "*"
+]
 # Provided Network Module vars
 ip_range = "10.11.12.0/28"
 

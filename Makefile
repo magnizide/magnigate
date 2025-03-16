@@ -5,7 +5,7 @@ ifneq (,$(wildcard ./$(ENV_ARG)))
 endif
 
 PROJECT_ROOT := $(realpath .)
-CONFIG_PATHS = config config/traefik config/pangolin
+CONFIG_PATHS = config/traefik config/pangolin config/letsencrypt
 SHELL := bash
 
 check_config_dir:
@@ -14,19 +14,29 @@ check_config_dir:
 		if [ -d $(PROJECT_ROOT)/$$conf_path ]; then \
     		echo "'$$conf_path' folder exists."; \
     	else \
-			echo "config folder $(PROJECT_ROOT)/$$conf_path does not exist."; \
-			$(MAKE) create_dir_config; \
+			echo "Creating dir: $$conf_path"; \
+			mkdir -p $$conf_path; \
     	fi; \
 	done
 
-create_dir_config:
-	@mkdir -p $(PROJECT_ROOT)/config/{traefik,pangolin}
-
 fill_templates:
-	envsubst < $(PROJECT_ROOT)/templates/config/traefik/dynamic_config.yaml.tpl > $(PROJECT_ROOT)/config/traefik/dynamic_config.yaml
+	@echo "Filling templates with env vars..."
+	@envsubst < $(PROJECT_ROOT)/templates/config/traefik/dynamic_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/dynamic_config.yaml
+	@envsubst < $(PROJECT_ROOT)/templates/config/traefik/traefik_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/traefik_config.yaml
+	@envsubst < $(PROJECT_ROOT)/templates/config/pangolin/config.yml.tpl > $(PROJECT_ROOT)/config/pangolin/config.yaml
 
-	envsubst < $(PROJECT_ROOT)/templates/config/traefik/traefik_config.yaml.tpl > $(PROJECT_ROOT)/config/traefik/traefik_config.yaml
+terraform_plan:
+	pushd terraform; \
+	terraform plan -var-file=tfvars/dev.tfvars; \
+	popd
 
-	envsubst < $(PROJECT_ROOT)/templates/config/pangolin/config.yaml.tpl > $(PROJECT_ROOT)/config/pangolin/config.yaml
+terraform_apply:
+	pushd terraform; \
+	terraform apply -auto-approve -var-file=tfvars/dev.tfvars; \
+	popd
 
+terraform_destroy:
+	pushd terraform; \
+	terraform destroy -auto-approve -var-file=tfvars/dev.tfvars; \
+	popd
 all: check_config_dir fill_templates

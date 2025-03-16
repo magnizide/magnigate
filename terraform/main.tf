@@ -17,4 +17,20 @@ module "compute" {
   subnet_id               = module.network.subnet_id
   external_static_address = module.network.external_static_address
   fw_rules_target_tags    = var.fw_rules_target_tags
+  service_account_email   = module.iam.service_account_email
+}
+
+module "registrar" {
+  source               = "./modules/registrar"
+  record_ip            = module.network.external_static_address
+  record_name          = var.record_name
+  cloudflare_zone_id   = var.cloudflare_zone_id
+  cloudflare_api_token = var.cloudflare_api_token
+}
+
+module "iam" {
+  source       = "./modules/iam"
+  bucket_name  = var.bucket_name
+  service_name = var.service_name
+  project_id   = var.project_id
 }
