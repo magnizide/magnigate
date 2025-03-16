@@ -21,9 +21,9 @@ check_config_dir:
 
 fill_templates:
 	@echo "Filling templates with env vars..."
-	@envsubst < $(PROJECT_ROOT)/templates/config/traefik/dynamic_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/dynamic_config.yaml
-	@envsubst < $(PROJECT_ROOT)/templates/config/traefik/traefik_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/traefik_config.yaml
-	@envsubst < $(PROJECT_ROOT)/templates/config/pangolin/config.yml.tpl > $(PROJECT_ROOT)/config/pangolin/config.yaml
+	@envsubst < $(PROJECT_ROOT)/templates/config/traefik/dynamic_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/dynamic_config.yml
+	@envsubst < $(PROJECT_ROOT)/templates/config/traefik/traefik_config.yml.tpl > $(PROJECT_ROOT)/config/traefik/traefik_config.yml
+	@envsubst < $(PROJECT_ROOT)/templates/config/pangolin/config.yml.tpl > $(PROJECT_ROOT)/config/pangolin/config.yml
 
 terraform_plan:
 	pushd terraform; \
