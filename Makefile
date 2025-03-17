@@ -27,16 +27,17 @@ fill_templates:
 
 terraform_plan:
 	pushd terraform; \
-	terraform plan -var-file=tfvars/dev.tfvars; \
+	terraform plan -var-file=tfvars/dev.tfvars -out tfplan; \
 	popd
 
 terraform_apply:
 	pushd terraform; \
-	terraform apply -auto-approve -var-file=tfvars/dev.tfvars; \
+	terraform apply -auto-approve -var-file=tfvars/dev.tfvars tfplan; \
 	popd
 
 terraform_destroy:
 	pushd terraform; \
 	terraform destroy -auto-approve -var-file=tfvars/dev.tfvars; \
 	popd
+
 all: check_config_dir fill_templates

@@ -12,7 +12,7 @@ provider "cloudflare" {
 }
 
 locals {
-  record_name_list = list(var.record_name, "*")
+  record_name_list = tolist([var.record_name, "*"])
 }
 
 resource "cloudflare_record" "a_record" {

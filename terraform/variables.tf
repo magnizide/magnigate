@@ -66,7 +66,7 @@ variable "cloudflare_zone_id" {
 
 variable "record_name" {
   description = "The name of the A record (e.g., 'www', '@', 'subdomain')"
-  type        = list(string)
+  type        = string
 }
 
 # IAM module vars
