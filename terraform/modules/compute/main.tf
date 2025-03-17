@@ -43,6 +43,6 @@ resource "google_compute_instance" "instance" {
   }
   service_account {
     email  = var.service_account_email
-    scopes = ["cloud-platform"]
+    scopes = ["https://www.googleapis.com/auth/devstorage.read_only"]
   }
 }
