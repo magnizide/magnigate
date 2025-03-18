@@ -70,7 +70,7 @@ jobs:
         id: private_key
         working-directory: terraform
         run: |
-          terraform output -raw private_key | base64 -w 0 >> "${{ github.WORKSPACE }}/private_key"
+          terraform output -raw private_key | base64 -w 0 > "${{ github.WORKSPACE }}/private_key"
       
       - name: Cache SSH key
         id: create_cache
