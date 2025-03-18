@@ -118,7 +118,7 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           source ansible_venv/bin/activate
-          ansible-playbook -i inventory/proxy.gcp.yaml playbooks/proxy.yaml -u ${{ secrets.REMOTE_USER }} --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}" --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}" --private_key private_key
+          ansible-playbook -i inventory/proxy.gcp.yaml playbooks/proxy.yaml -u ${{ secrets.REMOTE_USER }} --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}" --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}" --private-key private_key
         env:
           ANSIBLE_CONFIG: ansible.cfg
 
