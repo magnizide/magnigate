@@ -93,10 +93,10 @@ jobs:
         id: restore_cache
         uses: actions/cache@v4
         with:
-          path: "${{ github.WORKSPACE }}/private_key"
+          path: "${{ github.WORKSPACE }}/ansible/private_key"
           key: ssh_file
       
-      - name: Decode SSH
+      - name: Fix permissions
         id: decode
         run: |
           pwd
