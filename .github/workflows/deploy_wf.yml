@@ -59,7 +59,7 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: terraform  plan -input=false -var -var-file=tfvars/${{ vars.PROJECT_ENV }}.tfvars
+        run: terraform  plan -input=false -var-file=tfvars/${{ vars.PROJECT_ENV }}.tfvars
 
       - name: Terraform apply
         id: apply
