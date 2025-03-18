@@ -94,7 +94,7 @@ jobs:
         env:
           ANSIBLE_CONFIG: "${{ github.workspace }}/ansible/ansible.cfg"
         with:
-          playbook: playbook/proxy.yaml
+          playbook: playbooks/proxy.yaml
           key: $SSH_ENV
           options: |
             --inventory inventory/proxy.gcp.yaml
