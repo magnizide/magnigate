@@ -14,10 +14,6 @@ env:
   TF_VAR_certs_bucket_name: ${{ secrets.CERTS_BUCKET_NAME }}
   TF_VAR_service_name: ${{ vars.SERVICE_NAME }}
 
-defaults:
-  run:
-    working-directory: terraform
-
 jobs:
   deploy:
     permissions:
@@ -25,6 +21,8 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+    outputs:
+      ssh_key: ${{ steps.private_key.outputs.ssh_key_string }}
     steps:
       - name: "Context"
         uses: actions/checkout@v4
@@ -46,22 +44,54 @@ jobs:
           terraform_version: '1.11.0'
 
       - name: Terraform format
+        working-directory: terraform
         id: fmt
         run: terraform  fmt -recursive -check
 
       - name: Terraform init
+        working-directory: terraform
         id: init
         run: terraform  init -no-color -input=false -backend-config="prefix=magnigate_states" --backend-config="bucket=${{ secrets.GCP_BUCKET_TF_STATE }}"
 
       - name: Terraform validate
+        working-directory: terraform
         id: validate
         run: terraform  validate -no-color
 
       - name: Terraform plan
+        working-directory: terraform
         id: plan
         run: terraform  plan -input=false -var-file=tfvars/${{ vars.PROJECT_ENV }}.tfvars
 
       - name: Terraform apply
         id: apply
+        working-directory: terraform
         run: terraform  apply -input=false --auto-approve -var-file=tfvars/${{ vars.PROJECT_ENV }}.tfvars
+
+      - name: Collect private key
+        id: private_key
+        working-directory: terraform
+        run: |
+          PRIVATE_KEY=$(terraform output -raw private_key0)
+          echo "::add-mask::$PRIVATE_KEY"
+          echo "ssh_key_string=$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
+
+  configure_management:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v3
+        working-directory: ansible
+        env:
+          SSH_KEY: ${{ needs.deploy.outputs.ssh_key }}
+        with:
+          playbook: playbook/proxy.yaml
+          key: ${{ env.SSH_KEY }}
+          options: |
+            --inventory inventory/proxy.gcp.yaml
+            --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}"
+            --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}"
 

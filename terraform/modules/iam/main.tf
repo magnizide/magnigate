@@ -5,7 +5,7 @@ resource "google_service_account" "instance_sa" {
 
 resource "google_project_iam_member" "instance_sa_bucket_access" {
   project = var.project_id
-  role    = "roles/storage.admin"
+  role    = "roles/storage.objectViewer"
   member  = "serviceAccount:${google_service_account.instance_sa.email}"
 }
 
