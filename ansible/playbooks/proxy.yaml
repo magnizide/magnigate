@@ -46,7 +46,7 @@
           - gcloud
           - storage
           - cp
-          - "gs://magnigate-acme-certs/dev/dev-acme.json"
+          - "gs://{{ certs_bucket }}/{{ env }}/{{ env }}-acme.json"
           - /opt/www/config/letsencrypt/acme.json
     - name: Change file ownership, group and permissions
       ansible.builtin.file:
