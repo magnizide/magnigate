@@ -94,10 +94,10 @@ jobs:
         env:
           ANSIBLE_CONFIG: "${{ github.workspace }}/ansible/ansible.cfg"
         with:
-          playbook: playbooks/proxy.yaml
+          playbook: "${{ github.workspace }}/playbooks/proxy.yaml"
           key: $SSH_ENV
           options: |
-            --inventory inventory/proxy.gcp.yaml
+            --inventory "${{ github.workspace }}/inventory/proxy.gcp.yaml"
             --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}"
             --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}"
             --user ${{ secrets.REMOTE_USER }}
