@@ -83,6 +83,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     needs: deploy
+    env:
+      SSH_FILE_PATH: "${{ github.WORKSPACE }}/private_key"
     defaults:
       run:
         working-directory: ansible
@@ -93,7 +95,7 @@ jobs:
         id: restore_cache
         uses: actions/cache@v4
         with:
-          path: "${{ github.WORKSPACE }}/ansible/private_key"
+          path: ${{ env.SSH_FILE_PATH }}
           key: ssh_file
       
       - name: Fix permissions
@@ -102,7 +104,7 @@ jobs:
           pwd
           ls -la
           ls -la ../
-          chmod 0600 private_key
+          chmod 0600 ${{ env.SSH_FILE_PATH }}
 
       - name: Google auth
         id: 'applierAuth'
@@ -128,7 +130,7 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           source ansible_venv/bin/activate
-          ansible-playbook -i inventory/proxy.gcp.yaml playbooks/proxy.yaml -u ${{ secrets.REMOTE_USER }} --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}" --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}" --private-key private_key
+          ansible-playbook -i inventory/proxy.gcp.yaml playbooks/proxy.yaml -u ${{ secrets.REMOTE_USER }} --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}" --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}" --private-key ${{ env.SSH_FILE_PATH }}
         env:
           ANSIBLE_CONFIG: ansible.cfg
 
