@@ -21,8 +21,6 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
-    outputs:
-      ssh_key: ${{ steps.private_key.outputs.ssh_key_string }}
     steps:
       - name: "Context"
         uses: actions/checkout@v4
@@ -72,9 +70,14 @@ jobs:
         id: private_key
         working-directory: terraform
         run: |
-          PRIVATE_KEY=$(terraform output -raw private_key | base64 -w 0)
-          echo "::add-mask::$PRIVATE_KEY"
-          echo "ssh_key_string=$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
+          terraform output -raw private_key | base64 -w 0 >> "${{ github.WORKSPACE }}/private_key"
+      
+      - name: Cache SSH key
+        id: create_cache
+        uses: actions/cache@4
+        with:
+          path: "${{ github.WORKSPACE }}/private_key"
+          key: ssh_file
 
   configure_management:
     runs-on: ubuntu-latest
@@ -85,13 +88,19 @@ jobs:
         working-directory: ansible
     steps:
       - uses: actions/checkout@v4
-
+      
+      - name: Restore chache
+        id: restore_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: "${{ github.WORKSPACE }}/ansible/private_key"
+          key: ssh_file
+      
       - name: Decode SSH
         id: decode
-        env:
-          SSH_KEY: ${{ needs.deploy.outputs.ssh_key }}
         run: |
-          echo "SSH_ENV=$(echo $SSH_KEY | base64 --decode)" >> private_key
+          pwd
+          ls -la
           chmod 0600 private_key
 
       - name: Google auth
