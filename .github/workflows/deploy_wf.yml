@@ -17,6 +17,10 @@ jobs:
       - name: "Context"
         uses: actions/checkout@v4
 
+      - name: "Environment validation"
+        run: |
+          echo "Deploying to ${{ github.environment }}..."
+
       - name: Google auth
         id: 'applierAuth'
         uses: 'google-github-actions/auth@v2'
