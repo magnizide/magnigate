@@ -8,6 +8,11 @@ on:
 
 env:
   TF_WORKSPACE: ${{ vars.PROJECT_ENV }}
+  TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  TF_VAR_record_name: ${{ secrets.RECORD_NAME }}
+  TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
+  TF_VAR_certs_bucket_name: ${{ secrets.CERTS_BUCKET_NAME }}
+  TF_VAR_service_name: ${{ vars.SERVICE_NAME }}
 
 defaults:
   run:
