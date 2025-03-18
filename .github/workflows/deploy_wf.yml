@@ -91,9 +91,9 @@ jobs:
       
       - name: Restore chache
         id: restore_cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
-          path: "${{ github.WORKSPACE }}/ansible/private_key"
+          path: "${{ github.WORKSPACE }}/private_key"
           key: ssh_file
       
       - name: Decode SSH
@@ -101,6 +101,7 @@ jobs:
         run: |
           pwd
           ls -la
+          ls -la ../
           chmod 0600 private_key
 
       - name: Google auth
