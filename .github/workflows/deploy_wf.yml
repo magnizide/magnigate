@@ -102,6 +102,7 @@ jobs:
         with:
           playbook: "${{ github.workspace }}/ansible/playbooks/proxy.yaml"
           key: $SSH_ENV
+          requirements: "${{ github.workspace }}/ansible/requirements.yaml"
           options: |
             --inventory "${{ github.workspace }}/ansible/inventory/proxy.gcp.yaml"
             --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}"
