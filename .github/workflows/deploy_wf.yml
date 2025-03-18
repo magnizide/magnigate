@@ -80,32 +80,45 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     needs: deploy
+    defaults:
+      run:
+        working-directory: ansible
     steps:
       - uses: actions/checkout@v4
+
       - name: Decode SSH
         id: decode
-        working-directory:  ansible
         env:
           SSH_KEY: ${{ needs.deploy.outputs.ssh_key }}
         run: |
-          echo "SSH_ENV=$(echo $SSH_KEY | base64 --decode)" >> "$GITHUB_ENV"
+          echo "SSH_ENV=$(echo $SSH_KEY | base64 --decode)" >> private_key
+          chmod 0600 private_key
+
       - name: Google auth
         id: 'applierAuth'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY_FILE }}'
 
-      - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v3
-        env:
-          ANSIBLE_CONFIG: "${{ github.workspace }}/ansible/ansible.cfg"
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          playbook: "${{ github.workspace }}/ansible/playbooks/proxy.yaml"
-          key: $SSH_ENV
-          requirements: "${{ github.workspace }}/ansible/requirements.yaml"
-          options: |
-            --inventory "${{ github.workspace }}/ansible/inventory/proxy.gcp.yaml"
-            --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}"
-            --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}"
-            --user ${{ secrets.REMOTE_USER }}
+          python-version: '3.12'
+
+      - name: Create Virtual Environment
+        run: python3 -m venv ansible_venv
+
+      - name: Activate Virtual Environment
+        run: source ansible_venv/bin/activate
+
+      - name: Install Ansible and Dependencies
+        run: |
+          pip install ansible requests google-auth
+
+      - name: Run Ansible Playbook
+        run: |
+          source ansible_venv/bin/activate
+          ansible-playbook -i inventory/proxy.gcp.yaml playbooks/proxy.yaml -u ${{ secrets.REMOTE_USER }} --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}" --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}" --private_key private_key
+        env:
+          ANSIBLE_CONFIG: ansible.cfg
 
