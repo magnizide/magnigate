@@ -70,7 +70,7 @@ variable "record_name" {
 }
 
 # IAM module vars
-variable "bucket_name" {
+variable "certs_bucket_name" {
   type        = string
   description = "Bucket from where to pull needed files."
 }

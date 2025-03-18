@@ -8,7 +8,7 @@ variable "service_name" {
   description = "MagniOps Specific Project Name."
 }
 
-variable "bucket_name" {
+variable "certs_bucket_name" {
   type        = string
   description = "Bucket from where to pull needed files."
 }

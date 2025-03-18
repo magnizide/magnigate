@@ -29,8 +29,8 @@ module "registrar" {
 }
 
 module "iam" {
-  source       = "./modules/iam"
-  bucket_name  = var.bucket_name
-  service_name = var.service_name
-  project_id   = var.project_id
+  source            = "./modules/iam"
+  certs_bucket_name = var.certs_bucket_name
+  service_name      = var.service_name
+  project_id        = var.project_id
 }

@@ -1,0 +1,53 @@
+# GCP deployment
+name: Deploy
+on:
+  push:
+    branches:
+      - "main"
+      - "develop"
+
+jobs:
+  deploy:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Context"
+        uses: actions/checkout@v4
+
+      - name: Google auth
+        id: 'applierAuth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_KEY_FILE }}'
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.11.0'
+
+      - name: Terraform format
+        id: fmt
+        working-directory: terraform
+        run: terraform fmt -recursive -check
+
+      - name: Terraform validate
+        id: validate
+        working-directory: terraform
+        run: terraform validate -no-color
+
+      - name: Terraform init
+        id: init
+        working-directory: terraform
+        run: terraform init -no-color -input=false -backend-config="prefix=magnigate_states" --backend-config="bucket=${{ secrets.GCP_BUCKET_TF_STATE }}"
+
+      - name: Terraform plan
+        id: plan
+        working-directory: terraform
+        run: terraform plan -input=false -var "certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }}" -var-file=tfvars/${{ github.environment }}.tfvars
+
+      - name: Terraform apply
+        id: apply
+        working-directory: terraform
+        run: terraform apply -input=false --auto-approve -var 'certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }} -var-file=tfvars/${{ github.environment }}.tfvars
+

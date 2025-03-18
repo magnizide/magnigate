@@ -10,7 +10,7 @@ resource "google_project_iam_member" "instance_sa_bucket_access" {
 }
 
 resource "google_storage_bucket_iam_binding" "instance_sa_conditional_access" {
-  bucket = var.bucket_name
+  bucket = var.certs_bucket_name
   role   = "roles/storage.objectViewer"
 
   members = [
@@ -20,7 +20,7 @@ resource "google_storage_bucket_iam_binding" "instance_sa_conditional_access" {
   condition {
     title       = "RegexObjectAccess"
     description = "Allows access only to objects matching a specific regex"
-    expression  = "resource.name.startsWith(\"projects/_/buckets/${var.bucket_name}/objects/${terraform.workspace}\")"
+    expression  = "resource.name.startsWith(\"projects/_/buckets/${var.certs_bucket_name}/objects/${terraform.workspace}\")"
   }
 }
 
