@@ -89,15 +89,21 @@ jobs:
           SSH_KEY: ${{ needs.deploy.outputs.ssh_key }}
         run: |
           echo "SSH_ENV=$(echo $SSH_KEY | base64 --decode)" >> "$GITHUB_ENV"
+      - name: Google auth
+        id: 'applierAuth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY_FILE }}'
+
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v3
         env:
           ANSIBLE_CONFIG: "${{ github.workspace }}/ansible/ansible.cfg"
         with:
-          playbook: "${{ github.workspace }}/playbooks/proxy.yaml"
+          playbook: "${{ github.workspace }}/ansible/playbooks/proxy.yaml"
           key: $SSH_ENV
           options: |
-            --inventory "${{ github.workspace }}/inventory/proxy.gcp.yaml"
+            --inventory "${{ github.workspace }}/ansible/inventory/proxy.gcp.yaml"
             --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}"
             --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}"
             --user ${{ secrets.REMOTE_USER }}
