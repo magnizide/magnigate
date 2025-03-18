@@ -74,7 +74,7 @@ jobs:
       
       - name: Cache SSH key
         id: create_cache
-        uses: actions/cache@4
+        uses: actions/cache@v4
         with:
           path: "${{ github.WORKSPACE }}/private_key"
           key: ssh_file
