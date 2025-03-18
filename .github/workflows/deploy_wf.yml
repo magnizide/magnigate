@@ -6,6 +6,9 @@ on:
       - "main"
       - "develop"
 
+env:
+  TF_WORKSPACE: ${{ vars.PROJECT_ENV }}
+
 defaults:
   run:
     working-directory: terraform
@@ -23,7 +26,7 @@ jobs:
 
       - name: "Environment validation"
         run: |
-          echo "Deploying to ${{ environment }}..."
+          echo "Deploying to ${{ vars.PROJECT_ENV }}..."
           echo "Working directory"
           pwd
 
@@ -51,9 +54,9 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: terraform  plan -input=false -var "certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }}" -var-file=tfvars/${{ environment }}.tfvars
+        run: terraform  plan -input=false -var "certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }}" -var-file=tfvars/${{ vars.PROJECT_ENV }}.tfvars
 
       - name: Terraform apply
         id: apply
-        run: terraform  apply -input=false --auto-approve -var 'certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }} -var-file=tfvars/${{ environment }}.tfvars
+        run: terraform  apply -input=false --auto-approve -var 'certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }} -var-file=tfvars/${{ vars.PROJECT_ENV }}.tfvars
 
