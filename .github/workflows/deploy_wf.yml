@@ -12,8 +12,7 @@ jobs:
       contents: 'read'
       id-token: 'write'
     runs-on: ubuntu-latest
-    environment: ${{ github.head_ref == 'main' && 'prod' || (github.head_ref == 'develop' && 'dev' }}
-
+    environment: ${{ github.head_ref == 'main' && 'prod' || github.head_ref == 'develop' && 'dev' }}
     steps:
       - name: "Context"
         uses: actions/checkout@v4
