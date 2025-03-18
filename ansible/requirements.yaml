@@ -1,2 +1,2 @@
 collections:
-  - name: google.cloud.gcp_compute
+  - name: google.cloud
