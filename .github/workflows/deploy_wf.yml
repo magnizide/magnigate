@@ -72,7 +72,7 @@ jobs:
         id: private_key
         working-directory: terraform
         run: |
-          PRIVATE_KEY=$(terraform output -raw private_key0)
+          PRIVATE_KEY=$(terraform output -raw private_key)
           echo "::add-mask::$PRIVATE_KEY"
           echo "ssh_key_string=$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
 
