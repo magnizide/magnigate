@@ -1,3 +1,2 @@
 collections:
   - name: google.cloud.gcp_compute
-    source: "https://galaxy.ansible.com/"
