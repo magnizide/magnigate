@@ -105,6 +105,7 @@ jobs:
           ls -la
           ls -la ../
           chmod 0600 ${{ env.SSH_FILE_PATH }}
+          cat ${{ env.SSH_FILE_PATH }} | base64 --decode > ${{ env.SSH_FILE_PATH }}
 
       - name: Google auth
         id: 'applierAuth'
