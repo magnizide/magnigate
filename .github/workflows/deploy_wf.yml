@@ -6,6 +6,10 @@ on:
       - "main"
       - "develop"
 
+defaults:
+  run:
+    working-directory: terraform
+
 jobs:
   deploy:
     permissions:
@@ -20,6 +24,8 @@ jobs:
       - name: "Environment validation"
         run: |
           echo "Deploying to ${{ github.environment }}..."
+          echo "Working directory"
+          pwd
 
       - name: Google auth
         id: 'applierAuth'
@@ -34,25 +40,25 @@ jobs:
       - name: Terraform format
         id: fmt
         working-directory: terraform
-        run: terraform -chdir=terraform fmt -recursive -check
+        run: terraform  fmt -recursive -check
 
       - name: Terraform validate
         id: validate
         working-directory: terraform
-        run: terraform -chdir=terraform validate -no-color
+        run: terraform  validate -no-color
 
       - name: Terraform init
         id: init
         working-directory: terraform
-        run: terraform -chdir=terraform init -no-color -input=false -backend-config="prefix=magnigate_states" --backend-config="bucket=${{ secrets.GCP_BUCKET_TF_STATE }}"
+        run: terraform  init -no-color -input=false -backend-config="prefix=magnigate_states" --backend-config="bucket=${{ secrets.GCP_BUCKET_TF_STATE }}"
 
       - name: Terraform plan
         id: plan
         working-directory: terraform
-        run: terraform -chdir=terraform plan -input=false -var "certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }}" -var-file=tfvars/${{ github.environment }}.tfvars
+        run: terraform  plan -input=false -var "certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }}" -var-file=tfvars/${{ github.environment }}.tfvars
 
       - name: Terraform apply
         id: apply
         working-directory: terraform
-        run: terraform -chdir=terraform apply -input=false --auto-approve -var 'certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }} -var-file=tfvars/${{ github.environment }}.tfvars
+        run: terraform  apply -input=false --auto-approve -var 'certs_bucket_name=${{ secrets.CERTS_BUCKET_NAME }} -var-file=tfvars/${{ github.environment }}.tfvars
 
