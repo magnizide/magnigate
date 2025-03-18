@@ -72,7 +72,7 @@ jobs:
         id: private_key
         working-directory: terraform
         run: |
-          PRIVATE_KEY=$(terraform output -raw private_key)
+          PRIVATE_KEY=$(terraform output -raw private_key | base64 -w 0)
           echo "::add-mask::$PRIVATE_KEY"
           echo "ssh_key_string=$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
 
@@ -82,14 +82,20 @@ jobs:
     needs: deploy
     steps:
       - uses: actions/checkout@v4
+      - name: Decode SSH
+        id: decode
+        working-directory:  ansible
+        env:
+          SSH_KEY: ${{ needs.deploy.outputs.ssh_key }}
+        run: |
+          echo "SSH_ENV=$(echo $SSH_KEY | base64 --decode)" >> "$GITHUB_ENV"
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v3
         env:
-          SSH_KEY: ${{ needs.deploy.outputs.ssh_key }}
           ANSIBLE_CONFIG: "${{ github.workspace }}/ansible/ansible.cfg"
         with:
           playbook: playbook/proxy.yaml
-          key: ${{ env.SSH_KEY }}
+          key: $SSH_ENV
           options: |
             --inventory inventory/proxy.gcp.yaml
             --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}"
