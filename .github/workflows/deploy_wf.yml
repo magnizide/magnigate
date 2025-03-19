@@ -86,15 +86,17 @@ jobs:
         working-directory: ansible
     steps:
       - uses: actions/checkout@v4
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
+      
       - name: Google auth
         id: 'applierAuth'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY_FILE }}'
-     
+      
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+    
       - name: SSH file and fix permissions
         id: ssh_file
         run: |
