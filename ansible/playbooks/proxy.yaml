@@ -14,12 +14,20 @@
         repo: 'https://github.com/magnizide/magnigate.git'
         single_branch: true
         version: "{{ REPO_REF }}"
+    - name: Copy file dot env file
+      ansible.builtin.copy:
+        src: .env
+        dest: /opt/www
+        owner: root
+        group: root
+        mode: '0644'
     - name: Make All Target
       ansible.builtin.command:
         argv:
           - "make"
           - "-S"
           - "all"
+          - "ENV_FILE=.env"
         chdir: /opt/www
     - name: Gcloud pull certs
       ansible.builtin.command:

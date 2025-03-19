@@ -103,6 +103,11 @@ jobs:
           gcloud secrets versions access latest --secret=${{ secrets.SECRET_NAME }} --out-file=private_key
           chmod 0600 private_key
 
+      - name: Build dot env file
+        run: |
+          mkdir playbooks/files
+          echo "${{ secrets.DOTENV }}" > playbooks/files/.env
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
