@@ -21,8 +21,6 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
-    outputs:
-      SSH_CONTENT: ${{ steps.private_key.outputs.SSH_OUTPUT }}
     steps:
       - name: "Context"
         uses: actions/checkout@v4
@@ -38,6 +36,9 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY_FILE }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
 
       - uses: hashicorp/setup-terraform@v3
         with:
@@ -72,9 +73,9 @@ jobs:
         id: private_key
         working-directory: terraform
         run: |
-          ssh_output=$(terraform output -raw private_key | base64 -w 0)
-          echo "::add-mask::$ssh_output"
-          echo "SSH_OUTPUT=$ssh_output" >> "$GITHUB_OUTPUT"
+          terraform output -raw private_key > private_key
+          gcloud secrets versions add ${{ secrets.SECRET_NAME }} --data-file=private_key
+
 
   configure_management:
     runs-on: ubuntu-latest
@@ -85,13 +86,13 @@ jobs:
         working-directory: ansible
     steps:
       - uses: actions/checkout@v4
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
       
       - name: SSH file and fix permissions
-        id: decode
+        id: ssh_file
         run: |
-          SECRET="${{ needs.deploy.outputs.SSH_CONTENT }}"
-          echo "::add-mask::$SECRET"
-          echo "$SECRET" | base64 --decode > private_key
+          gcloud secrets versions access latest --secret=${{ secrets.SECRET_NAME }} --out-file=private_key
           chmod 0600 private_key
 
       - name: Google auth
