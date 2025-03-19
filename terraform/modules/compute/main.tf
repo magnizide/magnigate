@@ -4,7 +4,7 @@ data "google_client_openid_userinfo" "me" {
 data "google_compute_image" "base_image" {
   family      = var.image_family
   most_recent = true
-  project     = var.image_project
+  project     = var.project_id
 }
 
 resource "tls_private_key" "ssh_key" {

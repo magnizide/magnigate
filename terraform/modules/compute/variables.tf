@@ -6,13 +6,7 @@ variable "service_name" {
 variable "image_family" {
   type        = string
   description = "Base image family"
-  default     = "debian-12"
-}
-
-variable "image_project" {
-  type        = string
-  description = "Base image project"
-  default     = "debian-cloud"
+  default     = "magnisite-base-image-1-0-0"
 }
 
 variable "project_id" {

@@ -21,6 +21,8 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+    outputs:
+      SSH_CONTENT: ${{ steps.private_key.outputs.ssh_output }}
     steps:
       - name: "Context"
         uses: actions/checkout@v4
@@ -70,43 +72,26 @@ jobs:
         id: private_key
         working-directory: terraform
         run: |
-          terraform output -raw private_key > "${{ github.WORKSPACE }}/private_key"
-          cat "${{ github.WORKSPACE }}/private_key"
-
-      - name: Cache SSH key
-        id: create_cache
-        uses: actions/cache@v4
-        with:
-          path: "${{ github.WORKSPACE }}/private_key"
-          key: ssh_file
+          echo "ssh_output=$(terraform output -raw private_key)"
+          echo "::add-mask::$ssh_output"
 
   configure_management:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     needs: deploy
     env:
-      SSH_FILE_PATH: "${{ github.WORKSPACE }}/private_key"
+      SSH_FILE_CONTENT: ${{ needs.deploy.outputs.SSH_CONTENT }}
     defaults:
       run:
         working-directory: ansible
     steps:
       - uses: actions/checkout@v4
       
-      - name: Restore chache
-        id: restore_cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.SSH_FILE_PATH }}
-          key: ssh_file
-      
-      - name: Fix permissions
+      - name: SSH file and fix permissions
         id: decode
         run: |
-          pwd
-          ls -la
-          ls -la ../
-          chmod 0600 ${{ env.SSH_FILE_PATH }}
-          cat ${{ env.SSH_FILE_PATH }}
+          echo "${{ env.SSH_FILE_CONTENT }}" > private_key
+          chmod 0600 private_key
 
       - name: Google auth
         id: 'applierAuth'
@@ -132,7 +117,7 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           source ansible_venv/bin/activate
-          ansible-playbook -i inventory/proxy.gcp.yaml playbooks/proxy.yaml -u ${{ secrets.REMOTE_USER }} --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}" --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}" --private-key ${{ env.SSH_FILE_PATH }}
+          ansible-playbook -i inventory/proxy.gcp.yaml playbooks/proxy.yaml -u ${{ secrets.REMOTE_USER }} --extra-vars "PROJECT_ENV=${{ vars.PROJECT_ENV }}" --extra-vars "CERTS_BUCKET=${{ secrets.CERTS_BUCKET_NAME }}" --extra-vars "REPO_REF=${{ github.ref_name }}" --private-key private_key
         env:
           ANSIBLE_CONFIG: ansible.cfg
 

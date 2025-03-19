@@ -5,34 +5,15 @@
   tasks:
     - name: Ping Host
       ansible.builtin.ping:
-    - name: Set up Docker keyring
-      ansible.builtin.shell: | 
-        install -m 0755 -d /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-        chmod a+r /etc/apt/keyrings/docker.asc
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-        tee /etc/apt/sources.list.d/docker.list > /dev/null
-    - name: Runs 'apt-get update' and 'apt-get upgrade'
+    - name: Runs 'apt-get update'
       ansible.builtin.apt:
         update_cache: yes
-        upgrade: yes
-    - name: Install Docker
-      ansible.builtin.apt:
-        name:
-          - "docker-ce=5:28.0.1-1~debian.12~bookworm"
-          - "docker-ce-cli=5:28.0.1-1~debian.12~bookworm"
-          - containerd.io=1.7.25-1
-          - docker-buildx-plugin=0.21.1-1~debian.12~bookworm
-          - docker-compose-plugin=2.33.1-1~debian.12~bookworm
-          - make=4.3-4.1
-        state: latest
     - name: Pull project
       ansible.builtin.git:
         dest: /opt/www
         repo: 'https://github.com/magnizide/magnigate.git'
         single_branch: true
-        version: develop
+        version: {{ REPO_REF }}
     - name: Make All Target
       ansible.builtin.command:
         argv:
