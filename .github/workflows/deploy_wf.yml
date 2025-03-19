@@ -89,8 +89,9 @@ jobs:
       - name: SSH file and fix permissions
         id: decode
         run: |
-          echo "::add-mask::$SSH_FILE_CONTENT"
-          echo "${{ needs.deploy.outputs.SSH_CONTENT }}" | base64 --decode > private_key
+          SECRET="${{ needs.deploy.outputs.SSH_CONTENT }}"
+          echo "::add-mask::$SECRET"
+          echo "$SECRET" | base64 --decode > private_key
           chmod 0600 private_key
 
       - name: Google auth
