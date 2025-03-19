@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     outputs:
-      SSH_CONTENT: ${{ steps.private_key.outputs.ssh_output }}
+      SSH_CONTENT: ${{ steps.private_key.outputs.SSH_OUTPUT }}
     steps:
       - name: "Context"
         uses: actions/checkout@v4
@@ -72,14 +72,14 @@ jobs:
         id: private_key
         working-directory: terraform
         run: |
-          echo "ssh_output=$(terraform output -raw private_key | base64 -w 0)" >> "$GITHUB_OUTPUT"
+          ssh_output=$(terraform output -raw private_key | base64 -w 0)
+          echo "::add-mask::$ssh_output"
+          echo "SSH_OUTPUT=$ssh_output" >> "$GITHUB_OUTPUT"
 
   configure_management:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     needs: deploy
-    env:
-      SSH_FILE_CONTENT: ${{ needs.deploy.outputs.SSH_CONTENT }}
     defaults:
       run:
         working-directory: ansible
@@ -90,7 +90,7 @@ jobs:
         id: decode
         run: |
           echo "::add-mask::$SSH_FILE_CONTENT"
-          echo "${{ env.SSH_FILE_CONTENT }}" | base64 --decode > private_key
+          echo "${{ needs.deploy.outputs.SSH_CONTENT }}" | base64 --decode > private_key
           chmod 0600 private_key
 
       - name: Google auth
