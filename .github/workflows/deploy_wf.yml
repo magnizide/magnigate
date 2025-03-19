@@ -73,7 +73,6 @@ jobs:
         working-directory: terraform
         run: |
           echo "ssh_output=$(terraform output -raw private_key | base64 -w 0)" >> "$GITHUB_OUTPUT"
-          echo "::add-mask::$ssh_output"
 
   configure_management:
     runs-on: ubuntu-latest
@@ -90,7 +89,8 @@ jobs:
       - name: SSH file and fix permissions
         id: decode
         run: |
-          echo ${{ env.SSH_FILE_CONTENT }} | base64 --decode > private_key
+          echo "::add-mask::$SSH_FILE_CONTENT"
+          echo "${{ env.SSH_FILE_CONTENT }}" | base64 --decode > private_key
           chmod 0600 private_key
 
       - name: Google auth

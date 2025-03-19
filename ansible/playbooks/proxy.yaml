@@ -13,7 +13,7 @@
         dest: /opt/www
         repo: 'https://github.com/magnizide/magnigate.git'
         single_branch: true
-        version: {{ REPO_REF }}
+        version: "{{ REPO_REF }}"
     - name: Make All Target
       ansible.builtin.command:
         argv:
