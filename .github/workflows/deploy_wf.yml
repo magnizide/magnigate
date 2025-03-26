@@ -44,11 +44,6 @@ jobs:
         with:
           terraform_version: '1.11.0'
 
-      - name: Terraform format
-        working-directory: terraform
-        id: fmt
-        run: terraform  fmt -recursive -check
-
       - name: Terraform init
         working-directory: terraform
         id: init

@@ -1,0 +1,50 @@
+name: CI
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - "main"
+      - "develop"
+
+jobs:
+  integration:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.11.0'
+
+      - name: Terraform format
+        working-directory: terraform
+        id: fmt
+        run: terraform  fmt -recursive -check
+
+      - uses: terraform-linters/setup-tflint@v4
+        name: Setup TFLint
+
+      - name: TFLint run
+        run: tflint --recursive -f compact
+
+      - name: Run Terrascan
+        id: terrascan
+        uses: tenable/terrascan-action@main
+        with:
+          iac_type: 'terraform'
+          iac_version: 'v14'
+          policy_type: 'gcp'
+          only_warn: true
+          sarif_upload: true
+          non_recursive: true
+          iac_dir: terraform
+          skip_rules: 'AC_GCP_0232'
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
+        with:
+          args: "--skip-list=no-changed-when"
+          setup_python: "true"
+          working_directory: "ansible"

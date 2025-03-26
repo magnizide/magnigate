@@ -7,7 +7,7 @@
       ansible.builtin.ping:
     - name: Runs 'apt-get update'
       ansible.builtin.apt:
-        update_cache: yes
+        update_cache: true
     - name: Pull project
       ansible.builtin.git:
         dest: /opt/www
