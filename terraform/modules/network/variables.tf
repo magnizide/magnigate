@@ -14,12 +14,6 @@ variable "region" {
   default     = "us-east1"
 }
 
-variable "zone" {
-  type        = string
-  description = "GCP zone to use."
-  default     = "us-east1-b"
-}
-
 # Network Module Vars
 
 variable "ip_range" {
@@ -51,3 +45,4 @@ variable "fw_rules_target_tags" {
   type        = list(any)
   description = "Targets to apply the rules on."
 }
+

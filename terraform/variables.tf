@@ -3,18 +3,6 @@ variable "project_id" {
   description = "GCP Project to use."
 }
 
-variable "region" {
-  type        = string
-  description = "GCP region to use."
-  default     = "us-east1"
-}
-
-variable "zone" {
-  type        = string
-  description = "GCP zone to use."
-  default     = "us-east1-b"
-}
-
 variable "service_name" {
   type        = string
   description = "MagniOps Specific Project Name."

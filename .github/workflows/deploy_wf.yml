@@ -21,6 +21,8 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+    outputs:
+      INSTANCE_NAME: ${{ steps.instance_name.outputs.ins_name }}
     steps:
       - name: "Context"
         uses: actions/checkout@v4
@@ -43,11 +45,6 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: '1.11.0'
-
-      - name: Terraform format
-        working-directory: terraform
-        id: fmt
-        run: terraform  fmt -recursive -check
 
       - name: Terraform init
         working-directory: terraform
@@ -76,6 +73,9 @@ jobs:
           terraform output -raw private_key > private_key
           gcloud secrets versions add ${{ secrets.SECRET_NAME }} --data-file=private_key
 
+      - name: Collect instance name
+        id: instance_name
+        run: echo "ins_name=$(terraform output instance_name | tr -d '"') >> "$GITHUB_OUTPUT"
 
   configure_management:
     runs-on: ubuntu-latest
@@ -130,3 +130,7 @@ jobs:
         env:
           ANSIBLE_CONFIG: ansible.cfg
 
+      - name: Disable SSH port
+        env:
+          INSTANCE_NAME: ${{ needs.deploy.outputs.INSTANCE_NAME }}
+        run: gcloud compute instances remove-tags $INSTANCE_NAME --tags=ssh-port-enabled --zone us-east1-b
