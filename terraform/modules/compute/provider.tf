@@ -18,6 +18,3 @@ provider "google" {
   zone    = "us-east1-b"
 }
 
-provider "tls" {}
-
-

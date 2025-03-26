@@ -9,3 +9,8 @@ output "public_key" {
   sensitive   = true
   description = "SSH public key for CM access."
 }
+
+output "instance_name" {
+  value       = google_compute_instance.instance.name
+  description = "Name of the GCE instance."
+}
