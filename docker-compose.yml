@@ -7,8 +7,8 @@ services:
       - ./config/pangolin:/app/config
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
-      interval: "5s"
-      timeout: "10s"
+      interval: "12s"
+      timeout: "15s"
       retries: 5
 
   gerbil:
