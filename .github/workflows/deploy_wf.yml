@@ -76,7 +76,9 @@ jobs:
       - name: Collect instance name
         id: instance_name
         working-directory: terraform
-        run: echo "ins_name=$(terraform output instance_name | tr -d '"') >> "$GITHUB_OUTPUT"
+        run: |
+          RESULT=$(terraform output instance_name | tr -d '\"')
+          echo "ins_name=$RESULT" >> "$GITHUB_OUTPUT"
 
   configure_management:
     runs-on: ubuntu-latest
